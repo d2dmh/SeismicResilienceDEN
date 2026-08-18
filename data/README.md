@@ -28,7 +28,7 @@ All six files contain exactly seven model sheets:
 - data block: 6×6 pairwise distance matrix;
 - model mapping: `m.dist[i, j]`.
 
-The workbook itself does **not explicitly label the unit**. The model defines heating/cooling pipe loss rates per 1000 m, so metres are the working interpretation, but this should be confirmed by the original data author. Several cells contain `100000`; these act as very large distance/penalty-like values in the supplied model input, but their exact semantic meaning is not explicitly documented and is therefore not reinterpreted here.
+The workbook itself does **not explicitly label the unit**. The model defines heating/cooling pipe loss rates per 1000 m, so metres are the working interpretation, and the repository does not infer a stronger unit statement without author confirmation. Several cells contain `100000`; these act as very large distance/penalty-like values in the supplied model input, but their exact semantic meaning is not explicitly documented and is therefore not reinterpreted here.
 
 ### 2. `qty_day`
 
@@ -51,7 +51,7 @@ City-level values are identical across `b1`–`b6` within each workbook:
 | Wuhan | 17 | 17 | 17 | 17 | 17 | 17 |
 | Xi'an | 16 | 16 | 20 | 16 | 16 | 16 |
 
-The precise terminology for these multiplicities is not explicitly defined in the supplied spreadsheet, so the repository avoids renaming the original field.
+The precise terminology for these multiplicities is not explicitly defined in the current source workbook, so the original field name is retained.
 
 ### 3. `e_dem`
 

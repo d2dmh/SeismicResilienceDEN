@@ -156,9 +156,9 @@ The model defines unmet electricity, heating and cooling through `ele_loss`, `he
 
 - `Disaster_cost`: monetary penalty based on lost load;
 - `EENS`: expected energy not supplied quantity used in the notebook;
-- `EIU`: `EENS` divided by a fixed denominator (`3372805`) in the supplied implementation.
+- `EIU`: `EENS` divided by a fixed denominator (`3372805`) in the current implementation.
 
-The current repository documents these objects as implemented. It does not reinterpret the fixed EIU denominator because its provenance is not explicitly explained in the supplied materials.
+The current repository documents these objects as implemented. It does not reinterpret the fixed EIU denominator because its provenance is not explicitly explained in the current manuscript/data package.
 
 ## 7. Restoration-cost parameters
 
@@ -176,32 +176,12 @@ The current notebook uses restoration-cost coefficients consistent with the valu
 
 The repository retains the code values as the computational source.
 
-## 8. Important implementation notes for author review
+## 8. Documentation and validation boundary
 
-These points are documented because the current manuscript/Supplementary text and notebook are not fully synchronized. They are **not automatically corrected** in the public code because doing so could alter numerical results.
+The notebook is the executable reference for the current repository release. The manuscript and Supplementary Information describe the corresponding scientific framework, while some implementation-level details (for example exact input units, selected fixed parameters, and complete seismic restoration constraints) should be synchronized by the authors before the final archival release.
 
-### 8.1 Supplementary seismic-constraint subsection is incomplete
-
-The updated Supplementary Information now contains the location-specific seismic probability model, but the subsection titled `(h) seismic constraints` repeats network-constraint text rather than providing a complete mathematical statement of the damage/restoration constraints. The notebook therefore contains more seismic implementation detail than the current Supplementary text.
-
-### 8.2 PV roof-area limit differs between text and code
-
-The updated Supplementary Information states an assumed roof limit of 600 m². The notebook instead uses building-specific roof areas:
-
-```text
-b1 4500; b2 2600; b3 2000; b4 3800; b5 5600; b6 12000
-```
-
-The repository retains the notebook values.
-
-### 8.3 Electric-chiller representation differs in emphasis
-
-The notebook explicitly contains an electric chiller (`ec`) with capacity, operation, damage, and restoration variables. The updated Supplementary energy-balance wording emphasizes heat pump and absorption chiller in places. The repository retains the implemented `ec` model.
-
-### 8.4 `Disaster_hour` construction should be reviewed before changing model logic
-
-The stochastic generation loop samples a Python variable named `Disaster_hour`, while later constraint construction also references that variable. Because this can affect how scenario-specific event times enter some constraints, the implementation should be reviewed by the original model author before any refactor intended to change numerical behavior. This repository leaves the supplied logic unchanged.
+No model equation or parameter is altered in this repository solely to resolve a documentation difference. Scientific revisions should be author-approved, numerically benchmarked, and released as a new version.
 
 ## 9. Numerical-output boundary
 
-The notebook collects results into mutable Pyomo parameters (`m.ag_*`) but does not export a final results table. Therefore this repository is a cleaned **code + input-data package**, not a claim that all manuscript figures have been numerically regenerated from a fresh run.
+The notebook collects results into mutable Pyomo parameters (`m.ag_*`) but does not export a final results table. This release therefore provides the model implementation and input dataset, while a publication-level numerical benchmark should be added only after author validation.

@@ -2,33 +2,38 @@
 
 ## 1. Environment
 
-Recommended:
+Recommended baseline:
 
 - Python 3.10 or later;
 - NumPy;
 - pandas;
-- openpyxl (used by pandas to read `.xlsx` files);
+- openpyxl;
 - Pyomo;
 - Gurobi / gurobipy;
 - JupyterLab.
 
-Install Python packages from the repository root:
+From the repository root:
 
 ```bash
 python -m venv .venv
-```
-
-Activate the environment and run:
-
-```bash
 pip install -r requirements.txt
 ```
 
-A valid Gurobi license is required.
+A valid Gurobi license is required for optimization runs.
 
-## 2. Select a city
+## 2. Structural validation without Gurobi
 
-Open `code/full_cycle_model.ipynb` and edit only the user-configuration block unless you intentionally want to change model assumptions:
+Before running the optimization model, verify the package structure:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+This checks the six city files, workbook sheet names, seismic probability configuration, notebook syntax, and documentation links. The same check runs automatically in GitHub Actions.
+
+## 3. Select a city
+
+Open `code/full_cycle_model.ipynb` and edit the user-configuration block:
 
 ```python
 CITY = "harbin"
@@ -47,15 +52,45 @@ wuhan
 xian
 ```
 
-The notebook reads the city workbook path and M6/M7/M8 probabilities from:
+The notebook reads both the city workbook path and M6/M7/M8 probabilities from `config/seismic_probabilities.csv`.
 
-```text
-config/seismic_probabilities.csv
+## 4. Choose the run scale
+
+### Smoke test
+
+Use a small number of Monte Carlo realizations to confirm that the local Python/Gurobi environment can build and solve the model:
+
+```python
+N_MONTE_CARLO = 1  # or 5
+RANDOM_SEED = 2026
 ```
 
-## 3. Run from the repository root
+A smoke test is for software validation only and should **not** be interpreted as a manuscript-scale scientific result.
 
-Starting Jupyter from the repository root makes path resolution straightforward:
+### Study-scale run
+
+The current study configuration uses:
+
+```python
+N_MONTE_CARLO = 1000
+RANDOM_SEED = None
+```
+
+Because each realization invokes a large optimization model, a full run can be computationally expensive.
+
+## 5. Solver settings
+
+The notebook retains:
+
+```text
+Solver: Gurobi
+MIPGap: 0.001
+TimeLimit: 2400 seconds per solve
+```
+
+## 6. Run the notebook
+
+Start Jupyter from the repository root:
 
 ```bash
 jupyter lab
@@ -67,64 +102,11 @@ Then open and run:
 code/full_cycle_model.ipynb
 ```
 
-The notebook also searches parent directories for `config/seismic_probabilities.csv`, so it can still locate the repository root when the working directory is inside `code/`.
+The notebook also searches parent directories for `config/seismic_probabilities.csv`, so repository paths remain resolvable when the working directory is `code/`.
 
-## 4. Input validation before a run
+## 7. Results
 
-For the selected city, confirm:
-
-```text
-data/<city>/model_data.xlsx
-```
-
-contains these sheets:
-
-```text
-dist
-qty_day
-e_dem
-c_dem
-h_dem
-price
-SRI
-```
-
-The demand sheets must retain the two-level row index (building + scenario) and `h1`–`h168` columns.
-
-## 5. Monte Carlo behavior
-
-Default:
-
-```python
-N_MONTE_CARLO = 1000
-RANDOM_SEED = None
-```
-
-With `RANDOM_SEED = None`, stochastic event-time and component-failure draws change between runs. If a reproducible debugging run is needed, set a fixed integer, for example:
-
-```python
-RANDOM_SEED = 2026
-```
-
-A fixed seed is a repository convenience for reproducibility; the supplied manuscript materials do not explicitly report a historical seed used for the published calculations.
-
-## 6. Solver settings
-
-The notebook retains:
-
-```text
-Solver: Gurobi
-MIPGap: 0.001
-TimeLimit: 2400 seconds per solve
-```
-
-Because the default Monte Carlo count is 1000, a complete run can be computationally expensive.
-
-## 7. Results produced by the notebook
-
-After each successful solve, the notebook copies results into mutable Pyomo parameters with the prefix `ag_`.
-
-Examples:
+After each successful solve, model outputs are copied into mutable Pyomo parameters with the prefix `ag_`, including:
 
 ```text
 m.ag_results
@@ -151,35 +133,18 @@ m.ag_pv_e
 ...
 ```
 
-The current notebook does **not** automatically export these arrays to disk. `results/` is reserved for future result-export scripts/files.
+The current notebook does not automatically export these objects. The `results/` directory is reserved for author-validated benchmark outputs and future export routines.
 
-## 8. Repository-level verification
+## 8. Publication-level validation
 
-Before uploading or sharing the repository, run:
+Before freezing a journal/Zenodo release, perform at least one controlled reference benchmark:
 
-```bash
-python -m unittest discover -s tests -v
-```
+1. select one city and a fixed random seed;
+2. record the exact Python, NumPy, pandas, Pyomo, and Gurobi versions;
+3. run the public notebook;
+4. export total cost, cost components, EENS/EIU, and key capacities;
+5. compare them with an author-retained reference result;
+6. store the validated summary under `results/`;
+7. tag the verified repository version (for example `v1.0.0`).
 
-The tests check:
-
-- the six city files and sheet names;
-- seismic-probability configuration values;
-- absence of an archive/original-code folder;
-- notebook path configuration and syntax compilation;
-- notebook outputs/execution counters are cleared;
-- required documentation exists.
-
-This is a structural verification only. It does not invoke Gurobi and does not prove numerical agreement with manuscript figures.
-
-## 9. Recommended archival validation
-
-Before a final journal/Zenodo release, the model authors should ideally perform one controlled numerical benchmark:
-
-1. select one city and one fixed random seed;
-2. run the current public notebook;
-3. compare total cost, cost components, EENS/EIU and key capacities against an author-retained reference run;
-4. document solver/Python/Pyomo/Gurobi versions;
-5. only then freeze a versioned archival release.
-
-This step is intentionally separated from the repository-cleaning work so that code organization is not confused with scientific revalidation.
+This separates repository organization from scientific numerical validation and provides a reproducible reference point for future users.

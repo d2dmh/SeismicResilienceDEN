@@ -1,17 +1,56 @@
-# Full-cycle seismic resilience optimization of distributed energy networks
+# Spatiotemporal full-cycle optimal design enhances seismic resilience of distributed energy networks
 
-This repository provides the organized research code and six-city input dataset for a distributed energy network (DEN) seismic-resilience study. The model integrates **pre-hazard prevention, in-hazard adaptation, and post-hazard restoration (PAR)** in a stochastic multi-energy optimization framework.
+[![Repository integrity](https://github.com/d2dmh/SeismicResilienceDEN/actions/workflows/repository-integrity.yml/badge.svg)](https://github.com/d2dmh/SeismicResilienceDEN/actions/workflows/repository-integrity.yml)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![Pyomo](https://img.shields.io/badge/Model-Pyomo-4B8BBE)
+![Solver](https://img.shields.io/badge/Solver-Gurobi-EE3524)
+![Cases](https://img.shields.io/badge/Study%20cases-6%20cities-2F855A)
+![Status](https://img.shields.io/badge/release-pre--publication-orange)
 
-The public package is organized so that a reader can identify the model entry point, understand every input workbook, select a city, and trace the main variables and outputs without needing the authors' original working folders.
+This repository accompanies the manuscript **“Spatiotemporal full-cycle optimal design enhances seismic resilience of distributed energy networks.”** It contains the model implementation and six-city input dataset used to study distributed energy network (DEN) resilience under stochastic seismic disruption.
 
-## What is included
+The framework integrates **pre-hazard prevention**, **in-hazard adaptation**, and **post-hazard restoration** (PAR) within a stochastic multi-energy optimization model solved with Pyomo and Gurobi.
 
-- one cleaned and documented Pyomo/Gurobi model notebook;
-- six city-specific Excel input workbooks;
-- one readable seismic-probability configuration table;
-- a data manifest and field-level data dictionary;
-- model-formulation notes mapped to the current manuscript and Supplementary Information;
-- reproducibility instructions and repository integrity tests.
+## Repository guide
+
+| If you want to… | Start here |
+|---|---|
+| run the optimization model | [`code/full_cycle_model.ipynb`](code/full_cycle_model.ipynb) |
+| understand the notebook structure | [`code/README.md`](code/README.md) |
+| inspect city input files | [`data/`](data/) |
+| understand every worksheet/field | [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md) |
+| inspect seismic occurrence probabilities | [`config/seismic_probabilities.csv`](config/seismic_probabilities.csv) |
+| understand model formulation and implementation | [`docs/MODEL_DESCRIPTION.md`](docs/MODEL_DESCRIPTION.md) |
+| reproduce a model run | [`docs/REPRODUCTION.md`](docs/REPRODUCTION.md) |
+| check repository structure | `python -m unittest discover -s tests -v` |
+
+## Computational workflow
+
+```mermaid
+flowchart LR
+    A[City-level input workbook<br/>demand · prices · SRI · distances] --> D[PAR full-cycle DEN model]
+    B[City seismic probabilities<br/>M6 · M7 · M8] --> C[Monte Carlo seismic scenarios]
+    C --> D
+    E[Component fragility<br/>damage & restoration parameters] --> D
+    D --> F[Pyomo optimization]
+    F --> G[Gurobi solver]
+    G --> H[Capacity · dispatch · restoration<br/>cost · EENS · EIU]
+```
+
+## Study cases
+
+The dataset covers six representative urban districts spanning northern/southern climatic conditions and high/medium/low seismic-risk groups.
+
+| City | Climate group | Seismic-risk group | M6 | M7 | M8 |
+|---|---|---|---:|---:|---:|
+| Beijing | North | Medium | 0.015274137 | 0.002311834 | 0.000349910 |
+| Fuzhou | South | Medium | 0.006500000 | 0.000800000 | 0.000400000 |
+| Harbin | North | Low | 0.010600000 | 0.000100000 | 0.000030300 |
+| Pu'er | South | Low | 0.000222626 | 0.000037807 | 0.000007500 |
+| Wuhan | South | High | 0.048260000 | 0.006817000 | 0.000960000 |
+| Xi'an | North | High | 0.069747010 | 0.011575122 | 0.001920992 |
+
+`M6`, `M7`, and `M8` are city-level annual seismic occurrence probabilities used by the optimization model. The Supplementary Information describes the upstream CPSHA procedure based on the GB18306-2015 China Seismic Parameter Zoning Map, including a truncated Gutenberg–Richter magnitude model, a Poisson occurrence model, and PGA estimation. The region-specific coefficients required to independently regenerate all six probability triplets are not part of the current repository, so these probabilities are treated as input data.
 
 ## Repository structure
 
@@ -20,7 +59,6 @@ SeismicResilienceDEN/
 ├── README.md
 ├── requirements.txt
 ├── CITATION.cff
-├── .gitignore
 ├── code/
 │   ├── README.md
 │   └── full_cycle_model.ipynb
@@ -41,72 +79,30 @@ SeismicResilienceDEN/
 │   ├── MODEL_DESCRIPTION.md
 │   └── REPRODUCTION.md
 ├── results/
-│   └── README.md
-└── tests/
-    └── test_repository_integrity.py
-```
-
-## Study cases
-
-The current dataset contains six representative urban districts spanning northern/southern climatic conditions and high/medium/low seismic-risk groups.
-
-| City | Climate group | Seismic-risk group | M6 | M7 | M8 |
-|---|---|---|---:|---:|---:|
-| Beijing | North | Medium | 0.015274137 | 0.002311834 | 0.000349910 |
-| Fuzhou | South | Medium | 0.006500000 | 0.000800000 | 0.000400000 |
-| Harbin | North | Low | 0.010600000 | 0.000100000 | 0.000030300 |
-| Pu'er | South | Low | 0.000222626 | 0.000037807 | 0.000007500 |
-| Wuhan | South | High | 0.048260000 | 0.006817000 | 0.000960000 |
-| Xi'an | North | High | 0.069747010 | 0.011575122 | 0.001920992 |
-
-`M6`, `M7`, and `M8` are the city-level annual seismic occurrence probabilities supplied with the research materials. The updated Supplementary Information describes the CPSHA procedure used to derive magnitude-bin probabilities and PGA from the GB18306-2015 China Seismic Parameter Zoning Map. The complete regional parameter set needed to regenerate the six numeric probability triplets is not included here, so the supplied values are treated as model inputs rather than recalculated.
-
-## Computational workflow
-
-```text
-City workbook
-  ├─ dist       building-to-building distance matrix
-  ├─ qty_day    representative-period multiplicity
-  ├─ e_dem      electricity demand
-  ├─ c_dem      cooling demand
-  ├─ h_dem      heating demand
-  ├─ price      grid and natural-gas prices
-  └─ SRI        solar radiation index
-          │
-          ├──────── config/seismic_probabilities.csv
-          │          M6/M7/M8 annual occurrence probabilities
-          ↓
-Pyomo full-cycle DEN model
-  ├─ technology sizing
-  ├─ electricity / heating / cooling balances
-  ├─ storage and network operation
-  ├─ Monte Carlo earthquake onset
-  ├─ component fragility and damage states
-  ├─ unmet demand and EENS
-  └─ repair / restoration decisions
-          ↓
-Gurobi optimization for each Monte Carlo realization
-          ↓
-in-memory result containers (`m.ag_*`)
+│   ├── README.md
+│   └── .gitkeep
+├── tests/
+│   └── test_repository_integrity.py
+└── .github/workflows/
+    └── repository-integrity.yml
 ```
 
 ## Quick start
+
+### 1. Create the Python environment
 
 Python 3.10+ is recommended.
 
 ```bash
 python -m venv .venv
-```
-
-Activate the environment and install dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
-A local **Gurobi installation and valid Gurobi license** are required.
+A local **Gurobi installation and valid Gurobi license** are required for optimization runs.
 
-Start Jupyter from the repository root:
+### 2. Open the model
+
+From the repository root:
 
 ```bash
 jupyter lab
@@ -118,7 +114,7 @@ Open:
 code/full_cycle_model.ipynb
 ```
 
-The first configuration cell contains the user-facing controls:
+The first configuration cell contains the main user controls:
 
 ```python
 CITY = "harbin"      # beijing | fuzhou | harbin | puer | wuhan | xian
@@ -126,76 +122,78 @@ N_MONTE_CARLO = 1000
 RANDOM_SEED = None
 ```
 
-`RANDOM_SEED = None` preserves stochastic sampling. Set an integer only when a repeatable realization is required for debugging or benchmarking.
+For a quick **smoke test**, temporarily use a small Monte Carlo count such as `N_MONTE_CARLO = 1` or `5`. The study-scale configuration uses `1000` realizations.
 
-## Input workbook structure
+### 3. Run the notebook
 
-Every city workbook has the same seven worksheets:
+The selected city workbook and seismic probabilities are resolved automatically from `data/` and `config/seismic_probabilities.csv`.
 
-| Sheet | Shape including headers | Main role |
+See [`docs/REPRODUCTION.md`](docs/REPRODUCTION.md) for solver settings, runtime notes, output objects, and recommended publication-level validation.
+
+## Input data
+
+Every city workbook contains the same seven worksheets:
+
+| Sheet | Shape including headers | Model role |
 |---|---:|---|
-| `dist` | 7 × 7 | 6×6 pairwise building-distance matrix |
-| `qty_day` | 7 × 7 | representative-period multiplicities for `sum`, `win`, `mid`, `M6`, `M7`, `M8` |
-| `e_dem` | 37 × 170 | electricity demand: 6 buildings × 6 scenarios × 168 hourly values |
-| `c_dem` | 37 × 170 | cooling demand: 6 buildings × 6 scenarios × 168 hourly values |
-| `h_dem` | 37 × 170 | heating demand: 6 buildings × 6 scenarios × 168 hourly values |
-| `price` | 5 × 169 | 168-hour price profiles for `grid_buy1`, `grid_buy2`, `grid_sell`, `NG` |
-| `SRI` | 7 × 169 | 168-hour solar radiation profiles for the six scenarios |
+| `dist` | 7 × 7 | pairwise building distances / network input |
+| `qty_day` | 7 × 7 | representative-period multiplicities |
+| `e_dem` | 37 × 170 | electricity demand: 6 buildings × 6 scenarios × 168 h |
+| `c_dem` | 37 × 170 | cooling demand: 6 buildings × 6 scenarios × 168 h |
+| `h_dem` | 37 × 170 | heating demand: 6 buildings × 6 scenarios × 168 h |
+| `price` | 5 × 169 | electricity and natural-gas price profiles |
+| `SRI` | 7 × 169 | solar radiation index profiles |
 
-See [`data/README.md`](data/README.md) for a file-by-file explanation and [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md) for field-level definitions, model mappings, and unit notes.
+A compact file inventory is provided in [`data/DATA_MANIFEST.csv`](data/DATA_MANIFEST.csv). Detailed field definitions, indexing, units where documented, and Pyomo mappings are provided in [`data/README.md`](data/README.md) and [`docs/DATA_DICTIONARY.md`](docs/DATA_DICTIONARY.md).
 
 ## Model scope
 
-The current implementation includes:
+The public model currently represents:
 
 - six representative buildings (`b1`–`b6`);
-- 168 hourly time steps per representative profile (`h1`–`h168`);
+- 168 hourly time steps (`h1`–`h168`) per representative profile;
 - climate conditions `sum`, `win`, and `mid`;
 - seismic conditions `M6`, `M7`, and `M8`;
-- CHP, boiler, electric chiller, absorption chiller, heat pump, battery, cooling storage, grid, PV, and heating/cooling networks;
-- technology-specific fragility probabilities;
-- stochastic earthquake onset within hours 1–24;
-- unmet electricity/heating/cooling demand;
-- restoration decisions and restoration costs;
-- total annualized cost, EENS, EIU, capacity, dispatch, and cost-component results.
+- CHP, boiler, electric chiller, absorption chiller, heat pump, battery, cooling storage, utility grid, PV, and heating/cooling networks;
+- technology-specific seismic fragility;
+- stochastic earthquake onset and component failure states;
+- electricity, heating, and cooling load shedding;
+- component/network restoration decisions and restoration costs;
+- annualized cost, EENS, EIU, capacities, dispatch, and network flows.
 
-The objective implemented in the notebook combines device and pipe capital cost, fuel cost, maintenance cost, grid purchase minus grid-sale revenue, unmet-demand cost, and restoration cost. A detailed equation-to-code summary is provided in [`docs/MODEL_DESCRIPTION.md`](docs/MODEL_DESCRIPTION.md).
+The objective combines device and pipe capital costs, fuel cost, maintenance cost, net grid cost, unmet-demand cost, and restoration cost. See [`docs/MODEL_DESCRIPTION.md`](docs/MODEL_DESCRIPTION.md) for the equation-to-code mapping.
 
-## Output behavior
+## Outputs
 
-The supplied model does not automatically write a final CSV/Excel result package. During the Monte Carlo loop, results are copied into Pyomo mutable parameters named `m.ag_*`, including:
+During the Monte Carlo solve loop, results are retained in Pyomo mutable parameters with the prefix `m.ag_*`. These include total cost, cost components, EENS/EIU, technology capacities, hourly dispatch, network flows, and restoration-related values.
 
-- total objective (`ag_results`);
-- disaster/unmet-demand cost;
-- device and pipe cost;
-- maintenance and fuel cost;
-- grid import/export cost;
-- restoration cost;
-- EENS and EIU;
-- technology capacities;
-- hourly dispatch and inter-building flows;
-- damage-hour and restoration-related values.
+The current notebook does **not** automatically export a manuscript-ready CSV/Excel result package. The [`results/`](results/) directory is reserved for versioned, author-validated exports or benchmark outputs.
 
-The `results/` directory is intentionally empty in the repository and is reserved for future exported outputs.
+## Quick validation
 
-## Source and documentation boundary
-
-The current Supplementary Information now documents the DES cost objective, the base mathematical constraints, and the location-specific seismic probability model. However, its subsection labelled seismic constraints is still incomplete in the supplied version. For the actual implemented seismic damage/restoration logic, the public notebook is therefore the authoritative computational source in this package. Details and specific paper/code discrepancies are documented in [`docs/MODEL_DESCRIPTION.md`](docs/MODEL_DESCRIPTION.md).
-
-## Repository integrity check
-
-Run:
+Repository integrity can be checked without a Gurobi license:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-The tests verify file organization, six-city probability values, workbook sheet names, notebook syntax, and required documentation. They do **not** solve the optimization model.
+The test suite checks:
+
+- six-city data availability and workbook sheet names;
+- seismic-probability configuration values;
+- notebook syntax and repository-relative configuration;
+- required documentation and public file organization.
+
+The same structural check is run automatically by GitHub Actions. It does **not** solve the optimization model or establish numerical agreement with manuscript figures.
+
+## Reproducibility status
+
+This repository is currently a **pre-publication code and input-data release**. The model entry point and data organization are complete enough for author review and computational inspection. Before a final archival release, the authors should freeze one validated reference run, confirm the final software environment, and add the manuscript DOI/citation metadata.
 
 ## Citation
 
-See `CITATION.cff`. Update the final journal citation and DOI when the associated manuscript is publicly available.
+Citation metadata are provided in [`CITATION.cff`](CITATION.cff). Final journal citation and DOI information should be added when available.
 
 ## License
 
-No software/data license was specified in the supplied research materials. A license should be selected by the project authors before formal public release.
+A software/data license has not yet been specified by the project authors. The license should be selected before the final public archival release.

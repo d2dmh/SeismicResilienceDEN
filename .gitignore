@@ -9,3 +9,4 @@ Thumbs.db
 gurobi.log
 results/*
 !results/.gitkeep
+!results/README.md

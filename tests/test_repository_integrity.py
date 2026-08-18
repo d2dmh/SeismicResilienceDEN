@@ -100,6 +100,25 @@ class RepositoryIntegrityTests(unittest.TestCase):
         self.assertIn("unit", text.lower())
         self.assertIn("not explicitly", text.lower())
 
+    def test_publication_readme_has_clean_first_screen_and_navigation(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("Spatiotemporal full-cycle optimal design enhances seismic resilience of distributed energy networks", text)
+        self.assertIn("```mermaid", text)
+        self.assertIn("Repository guide", text)
+        self.assertIn("Quick validation", text)
+        self.assertNotIn("original working folders", text)
+        self.assertNotIn("supplied research materials", text)
+
+    def test_github_integrity_workflow_is_included(self):
+        path = ROOT / ".github" / "workflows" / "repository-integrity.yml"
+        self.assertTrue(path.exists())
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("python -m unittest discover -s tests -v", text)
+
+    def test_results_directory_is_preserved_for_github(self):
+        self.assertTrue((ROOT / "results" / "README.md").exists())
+        self.assertTrue((ROOT / "results" / ".gitkeep").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
