@@ -1,0 +1,7 @@
+﻿city_id,city,city_zh,climate_group,seismic_risk_group,data_file,M6,M7,M8,normal_probability
+beijing,Beijing,北京,north,medium,data/beijing/model_data.xlsx,0.015274137,0.002311834,0.00034991,0.9821
+fuzhou,Fuzhou,福州,south,medium,data/fuzhou/model_data.xlsx,0.0065,0.0008,0.0004,0.9923
+harbin,Harbin,哈尔滨,north,low,data/harbin/model_data.xlsx,0.0106,0.0001,3.03e-05,0.9893
+puer,Pu'er,普洱,south,low,data/puer/model_data.xlsx,0.000222626,3.78073e-05,7.5e-06,0.9997
+wuhan,Wuhan,武汉,south,high,data/wuhan/model_data.xlsx,0.04826,0.006817,0.00096,0.944
+xian,Xi'an,西安,north,high,data/xian/model_data.xlsx,0.06974701,0.011575122,0.001920992,0.9168

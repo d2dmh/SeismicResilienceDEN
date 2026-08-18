@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the associated manuscript once final bibliographic details are available."
+title: "Full-cycle seismic resilience optimization of distributed energy networks"
+type: software
+version: 0.3.0
+date-released: 2026-08-18
+authors:
+  - family-names: Hu
+    given-names: Xinle
+  - family-names: Tan
+    given-names: Jiawei
+  - family-names: Xiong
+    given-names: Yawen
+  - family-names: Wang
+    given-names: Meng
+  - family-names: Jing
+    given-names: Rui
+  - family-names: Zhao
+    given-names: Yingru

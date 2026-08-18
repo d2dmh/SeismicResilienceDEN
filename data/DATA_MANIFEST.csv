@@ -1,0 +1,7 @@
+﻿city_id,city,source_filename,workbook,size_bytes,sha256,sheets,buildings,scenarios,hours_per_profile,sum_weight,win_weight,mid_weight,M6_weight,M7_weight,M8_weight
+beijing,Beijing,北京模型数据.xlsx,beijing/model_data.xlsx,119506,ddc5c0825dbc65b4642861fd9be210d3c7a6e96a866aacc235ca22f23d08bf34,dist|qty_day|e_dem|c_dem|h_dem|price|SRI,6,sum|win|mid|M6|M7|M8,168,11,17,24,11,11,11
+fuzhou,Fuzhou,福州模型数据.xlsx,fuzhou/model_data.xlsx,109406,8c0ff68ee1837bb1491b345abd0a45447f0a5f6ba003ffcf235e23be92c907c4,dist|qty_day|e_dem|c_dem|h_dem|price|SRI,6,sum|win|mid|M6|M7|M8,168,17,13,22,17,17,17
+harbin,Harbin,哈尔滨模型数据.xlsx,harbin/model_data.xlsx,118483,a6fca8e3a3aadce75b0753f5b57b92d97dfffd83c9879eda00b515f917e84f93,dist|qty_day|e_dem|c_dem|h_dem|price|SRI,6,sum|win|mid|M6|M7|M8,168,11,22,19,11,11,11
+puer,Pu'er,普洱模型数据.xlsx,puer/model_data.xlsx,123288,cbc4f0e7a7e0cbcdd79cf8a8717c8b0a6ea92ea320b59dbc993a74b29aa2cd69,dist|qty_day|e_dem|c_dem|h_dem|price|SRI,6,sum|win|mid|M6|M7|M8,168,19,13,20,19,19,19
+wuhan,Wuhan,武汉模型数据.xlsx,wuhan/model_data.xlsx,119524,c4265ea6f27f2d79652c62e913c22a4bd0fcb702109e6ac6291c2144ab13255a,dist|qty_day|e_dem|c_dem|h_dem|price|SRI,6,sum|win|mid|M6|M7|M8,168,17,17,17,17,17,17
+xian,Xi'an,西安模型数据.xlsx,xian/model_data.xlsx,100603,a2690b29089fc8d054fcc886363d80ad7b9dc4a003819585699031883d5ce44f,dist|qty_day|e_dem|c_dem|h_dem|price|SRI,6,sum|win|mid|M6|M7|M8,168,16,16,20,16,16,16
