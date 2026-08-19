@@ -1,4 +1,4 @@
-# SeismicResilienceDEN: Full-cycle seismic resilience of distributed energy networks
+# SeismicResilienceDEN: Full-cycle seismic resilience optimization of distributed energy networks
 
 ## Purpose
 
@@ -6,51 +6,46 @@ The code and data in this repository support the **peer review** of the manuscri
 
 **Spatiotemporal full-cycle optimal design enhances seismic resilience of distributed energy networks**
 
-The materials are provided so that reviewers and future users can inspect the stochastic optimization framework, reproduce the released six-city model inputs, and examine how seismic risk, component damage, energy-system operation, and restoration are coupled in the distributed energy network (DEN) model.
+The materials are provided so that reviewers and future users can inspect the stochastic optimization workflow, run the released Harbin example, and examine the processed six-city source data used by the study.
 
-The released implementation uses **Pyomo** for mathematical optimization and **Gurobi** as the solver. It represents the full **Prevention–Adaptation–Restoration (PAR)** cycle: pre-hazard system design, in-hazard redispatch under component failures, and post-hazard restoration.
+The model represents a distributed energy network (DEN) under seismic disruption through a full-cycle **prevention–adaptation–restoration (PAR)** framework. It combines energy-system design, multi-energy operation, Monte Carlo earthquake sampling, component fragility, unmet demand, and post-hazard restoration in a Pyomo optimization model solved with Gurobi.
 
 ## Workflow overview
 
 The released computational workflow is:
 
 ```text
-Six-city demand, price, solar-radiation, and network inputs
+Harbin model-ready input workbook
         ↓
-City-specific seismic occurrence probabilities (M6 / M7 / M8)
+Magnitude 6 / 7 / 8 earthquake annual occurrence probabilities
         ↓
 Monte Carlo sampling of earthquake onset and component damage
         ↓
-Full-cycle DEN optimization
-  ├─ Prevention: capacity and network design
-  ├─ Adaptation: post-damage multi-energy redispatch
-  └─ Restoration: repair decisions and restoration cost
+PAR optimization of design, operation, unmet demand, and restoration
         ↓
-System cost, unmet demand, EENS / EIU, capacities, dispatch, and restoration results
+Gurobi solution for each stochastic realization
 ```
 
 | Stage | Description |
 |---|---|
-| **Input data** | Six city-specific workbooks containing electricity, heating and cooling demand, energy prices, solar-radiation inputs, representative-period multiplicities, and inter-building distances. |
-| **Seismic setting** | Annual occurrence probabilities for the model scenarios labelled `M6`, `M7`, and `M8`, together with technology-specific failure probabilities embedded in the notebook. |
-| **Monte Carlo sampling** | Samples earthquake onset time and component damage states for each realization. |
-| **PAR optimization** | Co-optimizes energy-system design, post-hazard operation, unmet demand, and restoration within the implemented Pyomo formulation. |
-| **Result collection** | Stores objective, cost, resilience, capacity, dispatch, flow, damage, and restoration quantities in `m.ag_*` result containers. |
+| **Input data** | Harbin model-ready workbook containing inter-building distances, representative-week multiplicities, electricity/heating/cooling demand, energy prices, and solar-radiation profiles. |
+| **Seismic settings** | Annual occurrence probabilities for magnitude 6, 7, and 8 earthquake scenarios, together with technology-specific fragility probabilities embedded in the notebook. |
+| **Monte Carlo sampling** | Samples the earthquake onset time first and then samples component damage states for each stochastic realization. |
+| **PAR optimization** | Co-optimizes system design and operation under seismic disruption, including unmet demand and restoration decisions. |
+| **Model solution** | Solves the resulting Pyomo model with Gurobi for each Monte Carlo realization. |
 
 ## Data availability and public-release scope
 
-The study contains six representative urban districts: **Beijing, Fuzhou, Harbin, Pu'er, Wuhan, and Xi'an**. The model workbook for all six cities is included in this repository.
+The manuscript evaluates six Chinese cities: Beijing, Fuzhou, Harbin, Pu'er, Wuhan, and Xi'an. The executable public reproduction is provided for **Harbin**, while processed source data for all six cities are consolidated into a separate workbook.
 
-| Material | Public location | Scope |
+| Material | Repository location | Scope |
 |---|---|---|
-| Full-cycle optimization notebook | `code/full_cycle_model.ipynb` | Six-city model; select one city at a time |
-| City seismic-probability configuration | `code/config/seismic_probabilities.csv` | Six cities |
-| City model workbooks | `data/<city>/model_data.xlsx` | Six cities |
-| Python dependencies | `requirements.txt` | Pyomo/Gurobi environment |
-| Final exported benchmark-result package | Not currently included | To be added after author-side numerical validation |
-| Manuscript figure source data | Not currently included | Outside the present code-and-input release |
+| Full-cycle optimization notebook | `code/full_cycle_model.ipynb` | Harbin executable reproduction |
+| Model-ready input workbook | `code/data/harbin_model_data.xlsx` | Harbin only; directly read by the notebook |
+| Six-city supplementary source data | `data/six_city_supplementary_data.xlsx` | Beijing, Fuzhou, Harbin, Pu'er, Wuhan, and Xi'an |
+| Python dependencies | `requirements.txt` | Public execution environment |
 
-The repository contains the input workbooks required by the released notebook. A local Gurobi installation and valid Gurobi license are required to solve the optimization model.
+The six-city supplementary workbook is intended for source-data inspection. It contains the summer, transition-season, and winter representative-week electricity/heating/cooling loads, energy-price profiles, solar-radiation profiles, representative-week multiplicities, and city-level earthquake annual occurrence probabilities. It is **not** a replacement for the full model-ready Harbin workbook.
 
 ## Repository layout
 
@@ -60,28 +55,17 @@ SeismicResilienceDEN/
 ├── requirements.txt
 ├── code/
 │   ├── full_cycle_model.ipynb
-│   └── config/
-│       └── seismic_probabilities.csv
+│   └── data/
+│       └── harbin_model_data.xlsx
 └── data/
-    ├── beijing/
-    │   └── model_data.xlsx
-    ├── fuzhou/
-    │   └── model_data.xlsx
-    ├── harbin/
-    │   └── model_data.xlsx
-    ├── puer/
-    │   └── model_data.xlsx
-    ├── wuhan/
-    │   └── model_data.xlsx
-    └── xian/
-        └── model_data.xlsx
+    └── six_city_supplementary_data.xlsx
 ```
 
 ## Python environment
 
-Python 3.10 or later is recommended.
+Python **3.10 or later** is recommended. The released optimization is configured for **Gurobi 11.0** and requires a valid Gurobi license.
 
-Create and activate a virtual environment from the repository root:
+Create a virtual environment from the repository root:
 
 ```bash
 python -m venv .venv
@@ -99,26 +83,13 @@ Linux or macOS:
 source .venv/bin/activate
 ```
 
-Install the Python dependencies:
+Install the required packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-The principal dependencies are:
-
-```text
-numpy>=1.24,<3
-pandas>=2.0,<3
-openpyxl>=3.1,<4
-pyomo>=6.7,<7
-gurobipy>=11,<13
-jupyterlab>=4,<5
-```
-
-A valid **Gurobi license** is required.
-
-## Running the model
+## Running the Harbin reproduction
 
 Start Jupyter from the repository root:
 
@@ -132,184 +103,152 @@ Open:
 code/full_cycle_model.ipynb
 ```
 
-The first configuration cell contains the user-facing settings:
+The user-facing Monte Carlo settings are defined at the beginning of the notebook:
 
 ```python
-CITY = "harbin"      # beijing | fuzhou | harbin | puer | wuhan | xian
 N_MONTE_CARLO = 1000
 RANDOM_SEED = None
 ```
 
-The notebook reads the selected city workbook and city-level seismic probabilities automatically from the repository-relative paths.
+`N_MONTE_CARLO = 1000` reproduces the study-scale stochastic setting. A smaller value can be used for a quick functionality check. `RANDOM_SEED = None` retains stochastic sampling; an integer can be supplied when a repeatable debugging run is needed.
 
-For a short functionality check, reduce `N_MONTE_CARLO` before running the notebook. The full study-scale setting uses `N_MONTE_CARLO = 1000` and can be computationally expensive because Gurobi solves one large optimization problem for each realization.
-
-`RANDOM_SEED = None` preserves stochastic sampling between runs. An integer can be supplied for a repeatable debugging or benchmark run.
-
-## Input data
-
-Each city workbook contains the same seven worksheets. The numerical workbook structure is retained across all six cases.
-
-| Sheet | Structure | Model role |
-|---|---|---|
-| `dist` | 6 × 6 building-to-building matrix (`b1`–`b6`) | Inter-building distance used in heating/cooling network investment and transfer calculations |
-| `qty_day` | 6 buildings × 6 conditions | Multiplicity used when annualizing representative 168-hour profiles |
-| `e_dem` | building × condition × `h1`–`h168` | Electricity demand |
-| `c_dem` | building × condition × `h1`–`h168` | Cooling demand |
-| `h_dem` | building × condition × `h1`–`h168` | Heating demand |
-| `price` | 4 price series × `h1`–`h168` | Grid-purchase, grid-sale, and natural-gas prices |
-| `SRI` | 6 conditions × `h1`–`h168` | Solar radiation index used by the PV formulation |
-
-### `dist`
-
-The rows and columns are `b1`–`b6`. The matrix is read as `m.dist[i, j]` and enters pipe/network calculations.
-
-The supplied workbook does not explicitly label the distance unit. The implemented pipe-loss parameters are expressed per 1000 m, so metres are the working interpretation pending final author confirmation. Several entries use the value `100000`; this value is retained exactly as supplied.
-
-### `qty_day`
-
-Columns are:
+The notebook automatically locates:
 
 ```text
-sum, win, mid, M6, M7, M8
+code/data/harbin_model_data.xlsx
 ```
 
-The notebook reads these values as `m.qty_day[s, i]`. Each demand/price/SRI profile contains 168 hourly values (7 × 24 h), and `qty_day` is used as a multiplicity in annualized cost and demand-loss calculations. The repository retains the original field name because the precise terminology for this weighting quantity should be confirmed by the model authors.
+No manual path editing is required when the repository structure is retained.
 
-### `e_dem`, `c_dem`, and `h_dem`
+## Model configuration
 
-These worksheets use a two-level row index:
+The released Harbin model uses:
 
-```text
-building:  b1 ... b6
-condition: sum, win, mid, M6, M7, M8
-```
-
-with hourly columns:
-
-```text
-h1 ... h168
-```
-
-They are mapped to:
-
-```text
-e_dem → m.e_demand[i, s, h]
-c_dem → m.c_demand[i, s, h]
-h_dem → m.h_demand[i, s, h]
-```
-
-The supplied workbook headers do not explicitly state the energy/load unit, so no unit is added here by assumption.
-
-### `price`
-
-The four rows are:
-
-| Row | Model use |
+| Item | Setting |
 |---|---|
-| `grid_buy1` | Grid-purchase tariff applied to `b1`–`b5` |
-| `grid_buy2` | Grid-purchase tariff applied to `b6` |
-| `grid_sell` | Electricity export/feed-in tariff |
-| `NG` | Natural-gas price used by CHP and boiler fuel-cost terms |
+| Representative buildings | 6 (`b1`–`b6`) |
+| Time resolution | Hourly |
+| Representative profile length | 168 h = 1 representative week |
+| Climate conditions | Summer (`sum`), winter (`win`), transition season (`mid`) |
+| Seismic conditions | Magnitude 6 (`M6`), magnitude 7 (`M7`), magnitude 8 (`M8`) earthquake scenarios |
+| Monte Carlo realizations | 1000 by default |
+| Optimization platform | Pyomo |
+| Solver | Gurobi 11.0 |
+| Solver MIP gap | 0.001 |
+| Solver time limit | 2400 s per realization |
 
-All rows contain `h1`–`h168`. The supplied workbook does not explicitly state the monetary/energy unit.
+For model simplification, **based on local historical data, it is assumed that the seismic occurs in summer**. The earthquake scenarios are therefore evaluated under the summer representative condition. This assumption reduces the number of combined climate–seismic scenarios and the associated computational burden.
 
-### `SRI`
+## Harbin model-ready input workbook
 
-Rows are `sum`, `win`, `mid`, `M6`, `M7`, and `M8`; columns are `h1`–`h168`.
+`code/data/harbin_model_data.xlsx` can be read directly by the released notebook. The original model sheet names are retained for compatibility; the workbook includes a `README` sheet with full descriptions and units.
 
-The Supplementary Information defines SRI in **W/m²**. The notebook maps the sheet to `m.SRI[s, h]` and uses it in the PV-generation constraint.
+| Model sheet | Full description | Unit / interpretation | Model role |
+|---|---|---|---|
+| `dist` | Inter-building distance matrix | Source unit not explicitly specified; `100000` denotes a prohibited connection / extremely large penalty distance | Network availability and pipe-investment calculations |
+| `qty_day` | Representative-week multiplicity | weeks | Weights representative profiles in annual calculations |
+| `e_dem` | Electricity demand | kW | Electricity-balance input |
+| `c_dem` | Cooling demand | kW | Cooling-balance input |
+| `h_dem` | Heating demand | kW | Heating-balance input |
+| `price` | Grid purchase, grid feed-in, and natural-gas prices | CNY/kWh | Grid and fuel cost calculations |
+| `SRI` | Solar radiation index | W/m² | PV-generation constraint |
+
+The demand sheets use a two-level row index consisting of building (`b1`–`b6`) and model scenario (`sum`, `win`, `mid`, `M6`, `M7`, `M8`), followed by hourly columns `h1`–`h168`.
+
+### Representative-week multiplicity
+
+Each seasonal profile spans 168 hourly values. The `qty_day` values are therefore interpreted as **representative-week multiplicities**, rather than literal daily counts. For Harbin, the seasonal multiplicities are:
+
+| Representative week | Model label | Multiplicity |
+|---|---|---:|
+| Summer | `sum` | 11 |
+| Winter | `win` | 22 |
+| Transition season | `mid` | 19 |
+
+The three seasonal weights sum to 52 representative weeks.
+
+## Six-city supplementary source data
+
+`data/six_city_supplementary_data.xlsx` consolidates the processed source data for the six study cities into one formatted workbook. Full descriptive names and units are used in the tables; short model labels are retained only where needed to map the source data back to the executable model.
+
+| Worksheet | Contents |
+|---|---|
+| `README` | Dataset scope, units, model-label definitions, and release notes |
+| `Electricity_Load_kW` | Six-city summer, transition-season, and winter representative-week electricity demand |
+| `Heating_Load_kW` | Six-city summer, transition-season, and winter representative-week heating demand |
+| `Cooling_Load_kW` | Six-city summer, transition-season, and winter representative-week cooling demand |
+| `Energy_Prices_CNY_per_kWh` | Grid-purchase, grid-feed-in, and natural-gas price profiles |
+| `Solar_Radiation_W_per_m2` | Seasonal 168-hour solar-radiation profiles |
+| `Seismic_Probabilities` | Magnitude 6 / 7 / 8 earthquake annual occurrence probabilities |
+| `Representative_Week_Weights` | Summer, transition-season, and winter representative-week multiplicities |
+
+All seasonal load and solar-radiation profiles contain **168 hourly values**, corresponding to one representative week.
 
 ## Seismic probability settings
 
-The city-level configuration is stored in:
+`M6`, `M7`, and `M8` denote **magnitude 6 / 7 / 8 earthquake scenarios**. The values below are the **annual occurrence probabilities** used in the study.
 
-```text
-code/config/seismic_probabilities.csv
-```
+| City | Magnitude 6 | Magnitude 7 | Magnitude 8 |
+|---|---:|---:|---:|
+| Beijing | 0.015274137 | 0.002311834 | 0.000349910 |
+| Fuzhou | 0.006500000 | 0.000800000 | 0.000400000 |
+| Harbin | 0.010600000 | 0.000100000 | 0.000030300 |
+| Pu'er | 0.000222626 | 0.000037807 | 0.000007500 |
+| Wuhan | 0.048260000 | 0.006817000 | 0.000960000 |
+| Xi'an | 0.069747010 | 0.011575122 | 0.001920992 |
 
-| City | Climate group | Seismic-risk group | M6 | M7 | M8 |
-|---|---|---|---:|---:|---:|
-| Beijing | North | Medium | 0.015274137 | 0.002311834 | 0.000349910 |
-| Fuzhou | South | Medium | 0.006500000 | 0.000800000 | 0.000400000 |
-| Harbin | North | Low | 0.010600000 | 0.000100000 | 0.000030300 |
-| Pu'er | South | Low | 0.000222626 | 0.000037807 | 0.000007500 |
-| Wuhan | South | High | 0.048260000 | 0.006817000 | 0.000960000 |
-| Xi'an | North | High | 0.069747010 | 0.011575122 | 0.001920992 |
+The Supplementary Information describes the upstream location-specific seismic probability model using CPSHA, a truncated Gutenberg–Richter magnitude distribution, a Poisson occurrence model, and peak ground acceleration as a function of magnitude and epicentral distance. The public notebook uses the resulting city-level annual occurrence probabilities as model inputs.
 
-The values above are the annual occurrence probabilities supplied with the model materials for the three seismic scenarios labelled `M6`, `M7`, and `M8`.
+## Energy-system components
 
-The Supplementary Information describes the upstream location-specific seismic probability model using China Probabilistic Seismic Hazard Analysis (CPSHA), the GB18306-2015 China Seismic Parameter Zoning Map, a truncated Gutenberg–Richter magnitude distribution, a Poisson occurrence model, and peak ground acceleration (PGA) as a function of magnitude and epicentral distance. The regional coefficients required to independently regenerate every city-specific probability value are not included in the present repository, so the supplied probabilities are treated as model inputs.
+The Pyomo formulation includes:
 
-## Model settings
-
-| Setting | Released implementation |
+| Component | Model representation |
 |---|---|
-| Buildings | 6 representative buildings (`b1`–`b6`) |
-| Hourly profile | 168 h (`h1`–`h168`) |
-| Non-seismic conditions | `sum`, `win`, `mid` |
-| Seismic conditions | `M6`, `M7`, `M8` |
-| Monte Carlo realizations | 1000 by default |
-| Earthquake onset sampling | Integer hour sampled from 1–24 |
-| Energy carriers | Electricity, heating, cooling |
-| Solver | Gurobi |
-| MIP gap | 0.001 |
-| Time limit | 2400 s per realization |
+| Combined heat and power | Capacity, electricity/heat production, part-load and startup constraints, seismic damage and restoration |
+| Boiler | Heating capacity and production, fuel consumption, seismic damage and restoration |
+| Electric chiller | Cooling capacity, electricity consumption, seismic damage and restoration |
+| Absorption chiller | Cooling capacity, heat consumption, seismic damage and restoration |
+| Heat pump | Heating capacity, electricity consumption, seismic damage and restoration |
+| Electrical storage | Capacity, charging/discharging, stored energy, seismic damage and restoration |
+| Cooling storage | Capacity, charging/discharging, stored cooling, seismic damage and restoration |
+| Photovoltaics | Installed area and solar-radiation-dependent output, seismic damage and restoration |
+| Utility grid | Electricity import/export and seismic availability |
+| Heating/cooling networks | Inter-building transfer, pipe selection, transfer losses, seismic damage and restoration |
 
-The technology set includes:
+## Seismic damage and restoration treatment
 
-```text
-CHP
-boiler
-electric chiller
-absorption chiller
-heat pump
-electrical storage
-cooling storage
-PV
-utility grid
-heating network
-cooling network
-```
+For each Monte Carlo realization, the model first samples an earthquake onset hour and then samples component damage according to the magnitude-specific fragility probabilities.
 
-The objective minimizes total annualized system cost, including device and pipe capital cost, fuel cost, maintenance cost, grid-purchase cost minus grid-sale revenue, unmet-demand cost, and restoration cost.
+The restoration thresholds implemented in the notebook include both the **preparation/logistical delay** and the **component restoration time**. The restoration-time values reported in the manuscript and Supplementary Information refer to the component restoration duration itself; the code thresholds therefore occur later than those tabulated restoration durations.
 
-## Outputs
+## Model outputs
 
-The current notebook collects successful Monte Carlo solutions into mutable Pyomo result containers with the prefix `m.ag_*`.
+The public notebook is intended to demonstrate model solution rather than generate a separate result-export package. After each feasible Gurobi solve, it reports basic values including:
 
-Principal result groups include:
+- total annualized objective value;
+- unmet-demand cost (UDC);
+- expected energy not supplied (EENS);
+- restoration cost.
 
-| Result group | Examples |
-|---|---|
-| Total and component costs | `ag_results`, `ag_Disaster_cost`, `ag_device_cost`, `ag_pipe_cost`, `ag_maint_cost`, `ag_fuel_cost`, `ag_grid_im_cost`, `ag_grid_ex_cost`, `ag_restored_cost` |
-| Resilience metrics | `ag_EENS`, `ag_EIU` |
-| Optimized capacities | `ag_CHP_emax`, `ag_ec_cmax`, `ag_ac_cmax`, `ag_hp_hmax`, `ag_b_hmax`, `ag_ele_st_max`, `ag_cool_st_max`, `ag_pv_areamax` |
-| Hourly operation | CHP, PV, grid, storage, heating/cooling-device dispatch and inter-building flows |
-| Seismic/restoration state | Damage-hour, component-state, and restoration-related quantities |
-
-The released notebook does **not currently export a final CSV/Excel result package automatically**. A validated benchmark output can be added after the authors confirm the final numerical reproduction settings.
+All Pyomo decision variables remain available in the solved model instance for inspection. The unused EIU calculation and the former large in-memory result-collection containers are not included in the public release.
 
 ## Replication notes
 
-Before running the workflow, confirm that:
+Before running the model, confirm that:
 
-1. the selected city workbook remains at `data/<city>/model_data.xlsx`;
-2. all seven worksheet names remain unchanged: `dist`, `qty_day`, `e_dem`, `c_dem`, `h_dem`, `price`, and `SRI`;
-3. demand and SRI profiles retain the `h1`–`h168` column structure;
-4. the building labels remain `b1`–`b6` and scenario labels remain `sum`, `win`, `mid`, `M6`, `M7`, `M8`;
-5. `code/config/seismic_probabilities.csv` remains synchronized with the selected city workbook;
-6. a valid Gurobi installation and license are available;
-7. a small Monte Carlo count is used first when checking installation and path configuration;
-8. a fixed random seed and author-retained reference result should be used for the final numerical benchmark before archival release.
-
-The workbook values and scientific model formulation should not be changed solely for repository formatting. Any scientific change should be validated against the manuscript and Supplementary Information before release.
+1. `code/data/harbin_model_data.xlsx` remains in its released location and its model sheet names are unchanged;
+2. the notebook is run with a valid Gurobi 11.0 license;
+3. a smaller `N_MONTE_CARLO` value is used for a quick test before launching the default 1000-realization calculation;
+4. `M6`, `M7`, and `M8` are interpreted as magnitude 6, 7, and 8 earthquake scenarios, with the supplied values representing annual occurrence probabilities;
+5. the seismic cases use the summer representative condition under the study's simplifying assumption;
+6. `100000` in the distance matrix is retained as the prohibited-connection / extreme-penalty value;
+7. the six-city supplementary workbook is treated as processed source data and not as a direct substitute for the Harbin model-ready workbook.
 
 ## Status
 
-- The full-cycle Pyomo/Gurobi notebook is included.
-- Model workbooks for Beijing, Fuzhou, Harbin, Pu'er, Wuhan, and Xi'an are included.
-- City-specific M6/M7/M8 occurrence probabilities are included.
-- The current Supplementary Information documents the DES cost objective, base model constraints, and location-specific seismic probability method.
-- A standardized exported benchmark-result package has not yet been included.
-- Final unit metadata and selected manuscript/code consistency items should be confirmed by the model authors before the repository is frozen for archival release.
+- The full-cycle Pyomo/Gurobi model notebook is included.
+- A directly executable Harbin model-input workbook is included.
+- Processed six-city seasonal load, energy-price, solar-radiation, seismic-probability, and representative-week data are included in one supplementary workbook.
+- The public code uses Python 3.10 or later and Gurobi 11.0.
+- No separate result-export package is required for the released reproduction.
